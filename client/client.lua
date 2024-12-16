@@ -2,6 +2,7 @@ local activeFlamingHooves = {}
 local Horse
 local Authorize = false
 local alreadyChecked = false
+local canActivate = false
 
 RegisterNetEvent('SteamHexAuthorized')
 AddEventHandler('SteamHexAuthorized', function(isAuthorized)
@@ -61,16 +62,19 @@ local function FlamingHooves()
             activeFlamingHooves[Horse] = nil
             print("Flaming hooves removed from the horse")
         else
-            local currentFlamingHoovesCount = CountFlamingHooves()
-
+            canActivate = true
             if Config.LimitEnable then
-                if currentFlamingHoovesCount < Config.Limit then
-                    SetPedConfigFlag(Horse, 207, true)
-                    print("Flaming hooves activated!")
-                    activeFlamingHooves[Horse] = true
-                else
+                local currentFlamingHoovesCount = CountFlamingHooves()
+                if currentFlamingHoovesCount >= Config.Limit then
+                    canActivate = false
                     print("Flaming hooves limit reached. Cannot activate for this horse")
                 end
+            end
+
+            if canActivate then
+                SetPedConfigFlag(Horse, 207, true)
+                activeFlamingHooves[Horse] = true
+                print("Flaming hooves activated!")
             end
         end
     else
